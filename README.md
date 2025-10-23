@@ -38,3 +38,28 @@ cd [NOME-DA-PASTA-DO-PROJETO]
  O Docker Compose fará todo o trabalho: construir a imagem do Django, iniciar o banco de dados Postgres (com as credenciais definidas no docker-compose.yml) e aplicar as migrações automaticamente.
 ```bash
 docker compose up --build
+
+Comandos Úteis**
+Execute todos os comandos de gerenciamento do Django (como createsuperuser) usando docker compose exec
+```bash
+docker compose exec web python manage.py createsuperuser
+
+**Popular o Banco com Posts da API**
+Comando utilizado para buscar os dados no JSONPlaceholder
+```bash
+docker compose exec web python manage.py fetch_posts
+
+**Troubleshooting**
+Não consigo conectar ao http://127.0.0.1:8000/admin/
+
+Verifique se os containers estão rodando com docker ps.
+
+Verifique os logs do Gunicorn no terminal do docker compose up.
+
+Verifique se a linha ALLOWED_HOSTS no config/settings.py inclui '127.0.0.1' e 'localhost'.
+
+Não consigo logar no /admin/
+
+O banco de dados do Docker é novo e está vazio. Você precisa criar um novo super-usuário.
+
+Rode: docker compose exec web python manage.py createsuperuser
