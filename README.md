@@ -1,10 +1,8 @@
 # Desafio API Django (SampleMed)
 
-Aplicação Django 4.x containerizada para consumo da API [JSONPlaceholder](https://jsonplaceholder.typicode.com/). 🎯
+Aplicação Django 4.x containerizada que consome a API JSONPlaceholder e expõe os dados via RESTful API. 🎯
 
-Este projeto é uma aplicação Django que consome a API pública JSONPlaceholder (endpoint `/posts`), armazena os dados em um banco de dados PostgreSQL 15 e os exibe no Django Admin.
-
-O projeto utiliza Docker e Docker Compose para criar um ambiente de desenvolvimento 100% reproduzível.
+Este projeto utiliza Django REST Framework para expor os dados coletados em endpoints JSON, e é configurado com Docker/Docker Compose e PostgreSQL, seguindo as boas práticas de variáveis de ambiente (.env).
 
 ---
 
@@ -12,6 +10,7 @@ O projeto utiliza Docker e Docker Compose para criar um ambiente de desenvolvime
 
 - [Pré-requisitos](#pré-requisitos)
 - [Como Rodar (Docker)](#como-rodar-docker-recomendado)
+- [Endpoints da API](#endpoints-da-api)
 - [Comandos Úteis](#comandos-úteis)
 - [Troubleshooting (Solução de Problemas)](#troubleshooting-solução-de-problemas)
 
@@ -27,39 +26,58 @@ O projeto utiliza Docker e Docker Compose para criar um ambiente de desenvolvime
 
 ## Como Rodar (Docker Recomendado)
 
-Este projeto é configurado para rodar inteiramente com Docker Compose. O arquivo `docker-compose.yml` gerencia a aplicação e o banco de dados.
+Este projeto é configurado para rodar inteiramente com Docker Compose, lendo as configurações de um arquivo `.env`.
 
 **1. Clone o Repositório**
 ```bash
 git clone [URL-DO-SEU-REPOSITORIO]
 cd [NOME-DA-PASTA-DO-PROJETO]
 
-**2. Suba os Containers**
- O Docker Compose fará todo o trabalho: construir a imagem do Django, iniciar o banco de dados Postgres (com as credenciais definidas no docker-compose.yml) e aplicar as migrações automaticamente.
+2. Configure as Variáveis de Ambiente Copie o arquivo de exemplo para criar seu arquivo de configuração local.
+```bash
+cp .env-sample .env
+
+3. Suba os Containers O Docker Compose fará todo o trabalho: construir a imagem, iniciar o banco de dados e aplicar as migrações.
 ```bash
 docker compose up --build
+O servidor estará rodando em http://127.0.0.1:8000/.
 
-Comandos Úteis**
-Execute todos os comandos de gerenciamento do Django (como createsuperuser) usando docker compose exec
+---
+
+Endpoints da API
+A API RESTful expõe os posts coletados.
+
+Listar todos os Posts: GET /api/posts/
+
+URL: http://127.0.0.1:8000/api/posts/
+
+Detalhar um Post: GET /api/posts/<id>/
+
+Exemplo: http://127.0.0.1:8000/api/posts/1/
+
+---
+
+Comandos Úteis
+Execute todos os comandos de gerenciamento do Django usando docker compose exec.
+
+Criar um Super-Usuário (Acessar o /admin/)
 ```bash
 docker compose exec web python manage.py createsuperuser
+(Acesse o admin em: https://www.google.com/search?q=http://127.0.0.1:8000/admin/)
 
-**Popular o Banco com Posts da API**
-Comando utilizado para buscar os dados no JSONPlaceholder
+Popular o Banco com Posts da API Externa Este é o comando customizado para buscar dados da JSONPlaceholder.
 ```bash
 docker compose exec web python manage.py fetch_posts
 
-**Troubleshooting**
-Não consigo conectar ao http://127.0.0.1:8000/admin/
+---
 
-Verifique se os containers estão rodando com docker ps.
-
-Verifique os logs do Gunicorn no terminal do docker compose up.
-
-Verifique se a linha ALLOWED_HOSTS no config/settings.py inclui '127.0.0.1' e 'localhost'.
-
+Troubleshooting (Solução de Problemas)
 Não consigo logar no /admin/
 
-O banco de dados do Docker é novo e está vazio. Você precisa criar um novo super-usuário.
+O banco de dados do Docker é novo e está vazio. Você precisa criar um novo super-usuário (veja Comandos Úteis).
 
-Rode: docker compose exec web python manage.py createsuperuser
+A lista de "Posts" no Admin ou na API está vazia
+
+O banco está vazio. Você precisa popular os dados da API.
+
+Rode: docker compose exec web python manage.py fetch_posts
