@@ -1,21 +1,18 @@
 version: '3.9'
 
 services:
-  # (PostgreSQL 15)
   db:
     image: postgres:15
     container_name: postgres_db
+    # O Docker Compose vai ler o .env e injetar estas variáveis
+    #'DATABASE_URL' será lida automaticamente pelo Postgres
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      # Mudar os valores
-      - POSTGRES_DB=desafio_db
-      - POSTGRES_USER=desafio_user
-      - POSTGRES_PASSWORD=desafio_pass
     ports:
-      - "5432:5432" # Expõe a porta do Postgres 
+      - "5433:5432"
 
-  # O serviço da Aplicação Django
   web:
     build: .
     container_name: django_web
@@ -26,15 +23,11 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-    environment:
-      # As mesmas credenciais que definimos no serviço 'db'
-      - POSTGRES_NAME=desafio_db
-      - POSTGRES_USER=desafio_user
-      - POSTGRES_PASSWORD=desafio_pass
-      - POSTGRES_HOST=db # O nome do serviço 'db'
+    # Informa ao container para usar as variáveis do .env
+    env_file:
+      - .env
     depends_on:
-      - db # Diz ao Docker para esperar o 'db' estar pronto
+      - db
 
 volumes:
-  # Cria um "volume" para que os dados do Postgres não se percam
   postgres_data:
