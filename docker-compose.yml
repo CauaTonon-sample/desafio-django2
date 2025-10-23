@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  # (PostgreSQL 15)
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      # Mudar os valores
+      - POSTGRES_DB=desafio_db
+      - POSTGRES_USER=desafio_user
+      - POSTGRES_PASSWORD=desafio_pass
+    ports:
+      - "5432:5432" # Expõe a porta do Postgres 
+
+  # O serviço da Aplicação Django
+  web:
+    build: .
+    container_name: django_web
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      # As mesmas credenciais que definimos no serviço 'db'
+      - POSTGRES_NAME=desafio_db
+      - POSTGRES_USER=desafio_user
+      - POSTGRES_PASSWORD=desafio_pass
+      - POSTGRES_HOST=db # O nome do serviço 'db'
+    depends_on:
+      - db # Diz ao Docker para esperar o 'db' estar pronto
+
+volumes:
+  # Cria um "volume" para que os dados do Postgres não se percam
+  postgres_data:

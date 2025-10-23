@@ -1,0 +1,13 @@
+venv/
+*.env
+.env
+
+__pycache__/
+*.pyc
+
+*.sqlite3
+
+# Arquivos do OS
+.DS_Store
+
+.vscode/
